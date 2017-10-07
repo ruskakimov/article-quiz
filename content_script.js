@@ -21,25 +21,29 @@ if (!window._my_extension_memory) {
         }
         document.removeEventListener('mouseover', window._my_extension_memory.listeners.mouseover, false)
         document.removeEventListener('click', window._my_extension_memory.listeners.click, false)
-        console.log('removed')
         window._my_extension_memory.state.mouseoverListener = false
         window._my_extension_memory.state.clickListener = false
+        document.querySelector('.my-extension-message').style.display = 'none'
 
-        var re = /(The | the | a | an )/g
-        e.target.innerHTML = e.target.innerHTML.replace(re, '<span class="my-extension-yellow" data-truth="$&"> _ </span>')
+        var theReg = /(The | the )/g
+        var aReg = /(A | a )/g
+        var anReg = /(An | an )/g
+        var modif = e.target.innerHTML
+        modif = modif.replace(theReg, '<span class="my-extension-yellow" data-truth="the" data-original="$&"> _ </span>')
+        modif = modif.replace(aReg, '<span class="my-extension-yellow" data-truth="a" data-original="$&"> _ </span>')
+        modif = modif.replace(anReg, '<span class="my-extension-yellow" data-truth="an" data-original="$&"> _ </span>')
+        e.target.innerHTML = modif
     }
 
     var keypressHandler = function(e) {
-        if (e.code = 'Space') {
-            e.preventDefault()
-            var el = document.querySelector('.my-extension-yellow')
-            if (el) {
+        switch (e.code) {
+            case 'KeyZ':
+                var el = document.querySelector('.my-extension-yellow')
                 el.classList.remove('my-extension-yellow')
-                el.innerText = el.dataset.truth
-            }
-            else {
-                console.log('the end')
-            }
+                el.innerText = el.dataset.original
+                break;
+            case 'KeyX':
+                break;
         }
     }
 }
@@ -70,9 +74,14 @@ promiseDOMready()
                 click: clickHandler,
                 keypress: keypressHandler
             }
+            var msg = document.createElement('div')
+            var content = document.createTextNode('Select element')
+            msg.appendChild(content)
+            msg.classList.add('my-extension-message')
+            document.body.appendChild(msg)
         }
         else {
-            console.log(window._my_extension_memory)
+            document.querySelector('.my-extension-message').style.display = 'block'
             if (window._my_extension_memory.state.selection) {
                 window._my_extension_memory.state.selection.DOMelement.innerHTML = window._my_extension_memory.state.selection.innerHTML
                 window._my_extension_memory.state.selection = null

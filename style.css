@@ -6,3 +6,12 @@
     outline: 3px solid #faa;
     background: #fee;
 }
+
+.my-extension-message {
+    position: fixed;
+    color: #F00;
+    opacity: 0.6;
+    font: 2rem Verdana, sans-serif;
+    top: 1rem;
+    left: 1rem;
+}
