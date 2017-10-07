@@ -54,6 +54,12 @@
     font-weight: bold;
     position: relative;
 }
+.my-extension-option-button:hover {
+    cursor: pointer;
+}
+.my-extension-option-button:focus {
+    outline: none;
+}
 .my-extension-option-button:before {
     display: block;
     position: absolute;
