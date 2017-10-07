@@ -1,0 +1,8 @@
+.my-extension-yellow {
+    background: yellow;
+}
+
+.my-extension-outline {
+    outline: 3px solid #faa;
+    background: #fee;
+}
