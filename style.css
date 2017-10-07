@@ -6,7 +6,7 @@
 }
 @keyframes blink-animation {
     50% {
-        color: transparent;
+        background: transparent;
     }
 }
 
@@ -24,9 +24,56 @@
 
 .my-extension-message {
     position: fixed;
-    color: #F00;
-    opacity: 0.6;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999999;
+    color: #f55;
     font: 2rem Verdana, sans-serif;
-    top: 1rem;
-    left: 1rem;
+    padding: 1rem 2rem;
+    background: white;
+    border: 5px solid #faa;
+    border-top-width: 0;
+}
+
+.my-extension-panel {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.my-extension-option-button {
+    margin: 20px;
+    width: 100px;
+    height: 100px;
+    border: 7px solid #888;
+    border-radius: 50%;
+    background: #eee;
+    color: #888;
+    font-size: 40px;
+    font-weight: bold;
+    position: relative;
+}
+.my-extension-option-button:before {
+    display: block;
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translate(-50%, -100%);
+    color: #222;
+    background: #eee;
+    width: 25px;
+    height: 25px;
+    font: 18px monospace;
+    border-radius: 5px;
+    box-shadow: 0 2px 0px 1px #aaa;
+}
+.my-extension-option-the:before {
+    content: 'z';
+}
+.my-extension-option-a:before {
+    content: 'x';
+}
+.my-extension-option-an:before {
+    content: 'c';
 }
