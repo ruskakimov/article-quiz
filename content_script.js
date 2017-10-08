@@ -3,8 +3,10 @@ function makeApplyClassToCurrentTarget(className) {
     return function(e) {
         if (lastElement) lastElement.classList.remove(className)
         if (e) {
-            e.target.classList.add(className)
-            lastElement = e.target
+            if (!e.target.classList.contains('my-extension-message')) {
+                e.target.classList.add(className)
+                lastElement = e.target
+            }
         }
     }
 }
@@ -25,8 +27,8 @@ function insertOptionsPanel() {
 
     document.body.appendChild(panel)
     panel.style.display = 'none'
-    console.log('inserted panel')
 }
+
 
 function updateOptionsPanel() {
     var panel = document.querySelector('.my-extension-panel')
@@ -39,57 +41,79 @@ function updateOptionsPanel() {
     abtn.addEventListener('click', function(e) {handleAnswer('a')}, false)
     anbtn.addEventListener('click', function(e) {handleAnswer('an')}, false)
 
-    window._my_extension_memory.options = {
+    window._my_extension_memory.optionButtons = {
         the: thebtn,
         a: abtn,
         an: anbtn
     }
 }
 
-function endQuiz() {
-    console.log('the end')
-    // unbind option buttons listeners
-    // unbind key listener
+
+function unbindListener(action) {
+    document.removeEventListener(action, window._my_extension_memory.listeners[action], false)
+    window._my_extension_memory.bound[action] = false
 }
+
+
+function endQuiz() {
+    // unbind option button listeners?
+    unbindListener('keypress')
+    document.querySelector('.my-extension-panel').style.display = 'none'
+    console.log('the end')
+}
+
+
+var theReg = /(^|\s)(The )|( the )/g
+var aReg = /(^|\s)(A )|( a )/g
+var anReg = /(^|\s)(An )|( an )/g
+
+function replaceArticles(element) {
+    if (element.tagName === "P") {
+        var modif = element.innerText
+        modif = modif.replace(theReg, '<span class="my-extension-field" data-truth="the" data-original="$&"> _ </span>')
+        modif = modif.replace(aReg, '<span class="my-extension-field" data-truth="a" data-original="$&"> _ </span>')
+        modif = modif.replace(anReg, '<span class="my-extension-field" data-truth="an" data-original="$&"> _ </span>')
+        element.innerHTML = modif
+    }
+    else if (element.children) {
+        Array.prototype.forEach.call(element.children, function(child) {
+            replaceArticles(child)
+        })
+    }
+}
+
+
+function prepareNextField() {
+    var first = document.querySelector('.my-extension-field')
+    if (first) {
+        first.classList.add('my-extension-field-focused')
+        first.scrollIntoViewIfNeeded()
+    }
+    window._my_extension_memory.current_el = first
+}
+
 
 function clickHandler(e) {
     window._my_extension_memory.listeners.mouseover(null)
-    window._my_extension_memory.state.selection = {
+    window._my_extension_memory.selection = {
         DOMelement: e.target,
         innerHTML: e.target.innerHTML
     }
-    document.removeEventListener('mouseover', window._my_extension_memory.listeners.mouseover, false)
-    window._my_extension_memory.state.mouseoverListener = false
-    document.removeEventListener('click', window._my_extension_memory.listeners.click, false)
-    window._my_extension_memory.state.clickListener = false
+    unbindListener('mouseover')
+    unbindListener('click')
     document.querySelector('.my-extension-message').style.display = 'none'
-
-    var theReg = /(The | the )/g
-    var aReg = /(A | a )/g
-    var anReg = /(An | an )/g
-    var modif = e.target.innerHTML
-    modif = modif.replace(theReg, '<span class="my-extension-field" data-truth="the" data-original="$&"> _ </span>')
-    modif = modif.replace(aReg, '<span class="my-extension-field" data-truth="a" data-original="$&"> _ </span>')
-    modif = modif.replace(anReg, '<span class="my-extension-field" data-truth="an" data-original="$&"> _ </span>')
-    e.target.innerHTML = modif
-
-    var first = document.querySelector('.my-extension-field')
-    if (first) first.classList.add('my-extension-field-focused')
-    window._my_extension_memory.current_el = first
+    replaceArticles(e.target)
+    prepareNextField()
     updateOptionsPanel()
 }
 
+
 function handleAnswer(answer) {
     var el = window._my_extension_memory.current_el
-    if (!el) {
-        endQuiz()
-        return
-    }
-    window._my_extension_memory.options[answer].classList.add('my-extension-option-button-pressed')
+    window._my_extension_memory.optionButtons[answer].classList.add('my-extension-option-button-pressed')
     window.setTimeout(function(){
-        window._my_extension_memory.options[answer].classList.remove('my-extension-option-button-pressed')
+        window._my_extension_memory.optionButtons[answer].classList.remove('my-extension-option-button-pressed')
     }, 100)
-
     if (el.dataset.truth === answer) {
         if (!el.classList.contains('my-extension-false')) {
             el.classList.add('my-extension-true')
@@ -97,19 +121,18 @@ function handleAnswer(answer) {
         el.innerText = el.dataset.original
         el.classList.remove('my-extension-field')
         el.classList.remove('my-extension-field-focused')
-        Object.keys(_my_extension_memory.options).forEach(option => {
-            window._my_extension_memory.options[option].classList.remove('my-extension-option-button-false')
+        Object.keys(_my_extension_memory.optionButtons).forEach(option => {
+            window._my_extension_memory.optionButtons[option].classList.remove('my-extension-option-button-false')
         })
     }
     else {
         el.classList.add('my-extension-false')
-        window._my_extension_memory.options[answer].classList.add('my-extension-option-button-false')
+        window._my_extension_memory.optionButtons[answer].classList.add('my-extension-option-button-false')
     }
-    
-    var next = document.querySelector('.my-extension-field')
-    if (next) next.classList.add('my-extension-field-focused')
-    window._my_extension_memory.current_el = next
+    prepareNextField()
+    if (!window._my_extension_memory.current_el) endQuiz()
 }
+
 
 function keypressHandler(e) {
     switch (e.code) {
@@ -125,6 +148,7 @@ function keypressHandler(e) {
     }
 }
 
+
 var makeEl = function(tag, text, classList) {
     var el = document.createElement(tag)
     var content = document.createTextNode(text)
@@ -132,7 +156,6 @@ var makeEl = function(tag, text, classList) {
     if (classList) classList.forEach(name => el.classList.add(name))
     return el
 }
-
 
 
 function promiseDOMready() {
@@ -148,10 +171,10 @@ promiseDOMready()
             // first call
             console.log('first call')
             window._my_extension_memory = {}
-            window._my_extension_memory.state = {
-                mouseoverListener: false,
-                clickListener: false,
-                keypressListener: false
+            window._my_extension_memory.bound = {
+                mouseover: false,
+                click: false,
+                keypress: false
             }
             window._my_extension_memory.listeners = {
                 mouseover: applyOutlineToCurrentTarget,
@@ -164,25 +187,25 @@ promiseDOMready()
         }
         else {
             document.querySelector('.my-extension-message').style.display = 'block'
-            if (window._my_extension_memory.state.selection) {
-                window._my_extension_memory.state.selection.DOMelement.innerHTML = window._my_extension_memory.state.selection.innerHTML
-                window._my_extension_memory.state.selection = null
+            if (window._my_extension_memory.selection) {
+                window._my_extension_memory.selection.DOMelement.innerHTML = window._my_extension_memory.selection.innerHTML
+                window._my_extension_memory.selection = null
             }
         }
 
-        if (!window._my_extension_memory.state.mouseoverListener) {
+        if (!window._my_extension_memory.bound.mouseover) {
             console.log('attached mouseover listener')
             document.addEventListener('mouseover', window._my_extension_memory.listeners.mouseover, false)
-            window._my_extension_memory.state.mouseoverListener = true
+            window._my_extension_memory.bound.mouseover = true
         }
-        if (!window._my_extension_memory.state.clickListener) {
+        if (!window._my_extension_memory.bound.click) {
             console.log('attached click listener')
             document.addEventListener('click', window._my_extension_memory.listeners.click, false)
-            window._my_extension_memory.state.clickListener = true
+            window._my_extension_memory.bound.click = true
         }
-        if (!window._my_extension_memory.state.keypressListener) {
+        if (!window._my_extension_memory.bound.keypress) {
             console.log('attached keypress listener')
             document.addEventListener('keypress', window._my_extension_memory.listeners.keypress, false)
-            window._my_extension_memory.state.keypressListener = true
+            window._my_extension_memory.bound.keypress = true
         }
     })
