@@ -1,7 +1,7 @@
 .my-extension-field {
 }
 .my-extension-field-focused {
-    background: yellow;
+    background: yellow !important;
     animation: blink-animation 1s linear infinite;
 }
 @keyframes blink-animation {
@@ -45,6 +45,7 @@
 }
 .my-extension-option-button {
     margin: 20px;
+    padding: 0;
     width: 100px;
     height: 100px;
     border: 7px solid #888;
@@ -53,7 +54,10 @@
     color: #888;
     font-size: 40px;
     font-weight: bold;
+    text-align: center;
     position: relative;
+    box-shadow: none;
+    transition: all .1s ease-in;
 }
 .my-extension-option-button:hover {
     cursor: pointer;
