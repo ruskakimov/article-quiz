@@ -82,22 +82,30 @@ function clickHandler(e) {
 function handleAnswer(answer) {
     var el = window._my_extension_memory.current_el
     if (!el) {
-        console.log('the end')
+        endQuiz()
         return
     }
-    el.classList.remove('my-extension-field')
-    el.classList.remove('my-extension-field-focused')
-    el.innerText = el.dataset.original
+    window._my_extension_memory.options[answer].classList.add('my-extension-option-button-pressed')
+    window.setTimeout(function(){
+        window._my_extension_memory.options[answer].classList.remove('my-extension-option-button-pressed')
+    }, 100)
+
     if (el.dataset.truth === answer) {
-        el.classList.add('my-extension-true')
+        if (!el.classList.contains('my-extension-false')) {
+            el.classList.add('my-extension-true')
+        }
+        el.innerText = el.dataset.original
+        el.classList.remove('my-extension-field')
+        el.classList.remove('my-extension-field-focused')
+        Object.keys(_my_extension_memory.options).forEach(option => {
+            window._my_extension_memory.options[option].classList.remove('my-extension-option-button-false')
+        })
     }
     else {
         el.classList.add('my-extension-false')
+        window._my_extension_memory.options[answer].classList.add('my-extension-option-button-false')
     }
-    window._my_extension_memory.options[answer].style.transform = 'translateY(10px)'
-    window.setTimeout(function(){
-        window._my_extension_memory.options[answer].style.transform = ''
-    }, 100)
+    
     var next = document.querySelector('.my-extension-field')
     if (next) next.classList.add('my-extension-field-focused')
     window._my_extension_memory.current_el = next
