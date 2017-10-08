@@ -27,7 +27,7 @@
     top: 0;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 9999999;
+    z-index: 999999999;
     color: #f55;
     font: 2rem Verdana, sans-serif;
     padding: 1rem 2rem;
@@ -38,6 +38,7 @@
 
 .my-extension-panel {
     position: fixed;
+    z-index: 999999999;
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
