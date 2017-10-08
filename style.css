@@ -58,6 +58,7 @@
     position: relative;
     box-shadow: none;
     transition: all .1s ease-in;
+    box-shadow: 0 12px 15px 0px #555;
 }
 .my-extension-option-button:hover {
     cursor: pointer;
@@ -68,9 +69,9 @@
 .my-extension-option-button:before {
     display: block;
     position: absolute;
-    top: -20px;
+    top: -2px;
     left: 50%;
-    transform: translate(-50%, -100%);
+    transform: translateX(-50%);
     color: #222;
     background: #eee;
     width: 25px;
@@ -84,6 +85,7 @@
     border-color: #393;
     color: #393;
     background: #afa;
+    box-shadow: 0 0 5px 0px #555;
 }
 .my-extension-option-button-false {
     background: #faa;
