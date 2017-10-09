@@ -58,7 +58,7 @@
     position: relative;
     box-shadow: none;
     transition: all .1s ease-in;
-    box-shadow: 0 12px 15px 0px #555;
+    box-shadow: rgba(0,0,0,0.7) 0 12px 15px 0px;
 }
 .my-extension-option-button:hover {
     cursor: pointer;

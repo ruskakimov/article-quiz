@@ -37,9 +37,16 @@ function updateOptionsPanel() {
     var anbtn = document.querySelector('.my-extension-option-an')
     panel.style.display = 'block'
 
+    var removePressed = function(e) {
+        e.target.classList.remove('my-extension-option-button-pressed')
+    }
+
     thebtn.addEventListener('click', function(e) {handleAnswer('the')}, false)
     abtn.addEventListener('click', function(e) {handleAnswer('a')}, false)
     anbtn.addEventListener('click', function(e) {handleAnswer('an')}, false)
+    thebtn.addEventListener('transitionend', removePressed, false)
+    abtn.addEventListener('transitionend', removePressed, false)
+    anbtn.addEventListener('transitionend', removePressed, false)
 
     window._my_extension_memory.optionButtons = {
         the: thebtn,
@@ -111,9 +118,9 @@ function clickHandler(e) {
 function handleAnswer(answer) {
     var el = window._my_extension_memory.current_el
     window._my_extension_memory.optionButtons[answer].classList.add('my-extension-option-button-pressed')
-    window.setTimeout(function(){
-        window._my_extension_memory.optionButtons[answer].classList.remove('my-extension-option-button-pressed')
-    }, 100)
+    // window.setTimeout(function(){
+    //     window._my_extension_memory.optionButtons[answer].classList.remove('my-extension-option-button-pressed')
+    // }, 100)
     if (el.dataset.truth === answer) {
         if (!el.classList.contains('my-extension-false')) {
             el.classList.add('my-extension-true')
