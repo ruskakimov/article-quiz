@@ -54,9 +54,9 @@ var APP = function() {
         var btn_the = makeElement('button', 'the', [classNames.answerOptionButton, classNames.optionClasses.the])
         var btn_a   = makeElement('button', 'a',   [classNames.answerOptionButton, classNames.optionClasses.a])
         var btn_an  = makeElement('button', 'an',  [classNames.answerOptionButton, classNames.optionClasses.an])
-        btn_the.addEventListener('click', makeAnswerHandler('the'))
-        btn_a.addEventListener('click', makeAnswerHandler('a'))
-        btn_an.addEventListener('click', makeAnswerHandler('an'))
+        btn_the.addEventListener('click', e => handleAnswer('the'))
+        btn_a.addEventListener('click', e => handleAnswer('a'))
+        btn_an.addEventListener('click', e => handleAnswer('an'))
         answerPanel.appendChild(btn_the)
         answerPanel.appendChild(btn_a)
         answerPanel.appendChild(btn_an)
@@ -107,11 +107,10 @@ var APP = function() {
         else endQuiz()
     }
 
-    function makeAnswerHandler(chosenArticle) {
-        return function(e) {
-            console.log(chosenArticle)
-            selectNextField()
-        }
+    function handleAnswer(chosenArticle) {
+        if (!currentField) return
+        console.log(chosenArticle)
+        selectNextField()
     }
 
     function endQuiz() {
@@ -174,6 +173,20 @@ var APP = function() {
         }
     }
 
+    function documentKeypressHandler(e) {
+        switch (e.code) {
+            case 'KeyZ':
+                handleAnswer('the')
+                break;
+            case 'KeyX':
+                handleAnswer('a')
+                break;
+            case 'KeyC':
+                handleAnswer('an')
+                break;
+        }
+    }
+
     function start() {
         console.log('started app')
         // set up interface
@@ -183,6 +196,7 @@ var APP = function() {
         // add listeners
         document.addEventListener('mouseover', documentMouseoverHandler)
         document.addEventListener('click', documentClickHandler)
+        document.addEventListener('keypress', documentKeypressHandler)
         // notify background script
         chrome.runtime.sendMessage({opened: true})
     }
@@ -196,6 +210,7 @@ var APP = function() {
         // remove listeners
         document.removeEventListener('mouseover', documentMouseoverHandler)
         document.removeEventListener('click', documentClickHandler)
+        document.removeEventListener('keypress', documentKeypressHandler)
         chrome.runtime.onMessage.removeListener(messageHandler)
         // notify background script
         chrome.runtime.sendMessage({closed: true})
