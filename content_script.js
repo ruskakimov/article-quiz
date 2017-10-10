@@ -1,6 +1,22 @@
 (function() { // scoping function start
 console.log('script inserted')
 
+/**
+ * Create DOM element from the passed parameters
+ * @param {string} tagName 
+ * @param {string} text 
+ * @param {string[]} classNames 
+ */
+function makeElement(tagName, text, classNames) {
+    var el = document.createElement(tagName)
+    if (text) {
+        var content = document.createTextNode(text)
+        el.appendChild(content)
+    }
+    if (classNames) classNames.forEach(name => el.classList.add(name))
+    return el
+}
+
 var APP = function() {
     // private attrs
     var classNames = {
@@ -18,29 +34,34 @@ var APP = function() {
     }()
 
     function documentMouseoverHandler(e) {
-        console.log(e)
         highlightTarget(e.target)
     }
 
     function documentClickHandler(e) {
-        console.log(e)
         highlightTarget(null)
+        document.removeEventListener('mouseover', documentMouseoverHandler)
+        exitWithoutATrace()
+    }
+
+    function start() {
+        console.log('started app')
+        document.addEventListener('mouseover', documentMouseoverHandler)
+        document.addEventListener('click', documentClickHandler)
+        chrome.runtime.sendMessage({opened: true})
+    }
+
+    function exitWithoutATrace() {
+        console.log('reverting DOM modifications & removing listeners')
+        highlightTarget(null)
+        document.removeEventListener('mouseover', documentMouseoverHandler)
+        document.removeEventListener('click', documentClickHandler)
+        chrome.runtime.sendMessage({closed: true})
+        chrome.runtime.onMessage.removeListener(messageHandler)
     }
 
     return {
         // public attrs
-        start: function() {
-            console.log('started app')
-            document.addEventListener('mouseover', documentMouseoverHandler)
-            document.addEventListener('click', documentClickHandler)
-        },
-        exitWithoutATrace: function() {
-            console.log('removing inserted elements / listeners')
-            highlightTarget(null)
-            document.removeEventListener('mouseover', documentMouseoverHandler)
-            document.removeEventListener('click', documentClickHandler)
-            chrome.runtime.onMessage.removeListener(messageHandler)
-        }
+        start, exitWithoutATrace
     }
 }()
 
