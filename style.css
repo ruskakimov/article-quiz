@@ -82,18 +82,21 @@
 }
 .my-extension-option-button-pressed {
     transform: translateY(10px);
-    border-color: #393;
-    color: #393;
-    background: #afa;
     box-shadow: 0 0 5px 0px #555;
+}
+.my-extension-option-button-true {
+    background: #afa;
 }
 .my-extension-option-button-false {
     background: #faa;
 }
+.my-extension-option-button-true.my-extension-option-button-pressed {
+    border-color: #393;
+    color: #393;
+}
 .my-extension-option-button-false.my-extension-option-button-pressed {
-    border-color: #f33 !important;
-    color: #f33 !important;
-    background: #faa !important;
+    border-color: #f33;
+    color: #f33;
 }
 .my-extension-option-the:before {
     content: 'z';

@@ -24,6 +24,9 @@ var APP = function() {
         selectionMessage: 'my-extension-message',
         answerPanel: 'my-extension-panel',
         answerOptionButton: 'my-extension-option-button',
+        answerOptionButtonPressed: 'my-extension-option-button-pressed',
+        answerOptionButtonFalse: 'my-extension-option-button-false',
+        answerOptionButtonTrue: 'my-extension-option-button-true',
         optionClasses: {
             the: 'my-extension-option-the',
             a: 'my-extension-option-a',
@@ -31,6 +34,8 @@ var APP = function() {
         },
         articleField: 'my-extension-field',
         articleFieldFocused: 'my-extension-field-focused',
+        rightAnswer: 'my-extension-true',
+        wrongAnswer: 'my-extension-false',
         exitButton: 'my-extension-exit-btn'
     }
     const articleRegexes = {
@@ -51,23 +56,20 @@ var APP = function() {
         }
         // answer options panel
         var answerPanel = makeElement('div', null, [classNames.answerPanel])
-        var btn_the = makeElement('button', 'the', [classNames.answerOptionButton, classNames.optionClasses.the])
-        var btn_a   = makeElement('button', 'a',   [classNames.answerOptionButton, classNames.optionClasses.a])
-        var btn_an  = makeElement('button', 'an',  [classNames.answerOptionButton, classNames.optionClasses.an])
-        btn_the.addEventListener('click', e => handleAnswer('the'))
-        btn_a.addEventListener('click', e => handleAnswer('a'))
-        btn_an.addEventListener('click', e => handleAnswer('an'))
-        answerPanel.appendChild(btn_the)
-        answerPanel.appendChild(btn_a)
-        answerPanel.appendChild(btn_an)
+        const articles = ['the', 'a', 'an']
+        const answerButtons = articles.reduce((obj, article) => {
+            obj[article] = makeElement('button', article, [classNames.answerOptionButton, classNames.optionClasses[article]])
+            return obj
+        }, {})
+        articles.forEach(article => {
+            answerButtons[article].addEventListener('click', e => handleAnswer(article))
+            answerButtons[article].addEventListener('transitionend', e => e.target.classList.remove(classNames.answerOptionButtonPressed))
+            answerPanel.appendChild(answerButtons[article])
+        })
         interface.answerPanel = {
             el: answerPanel,
             present: false,
-            children: [
-                btn_the,
-                btn_a,
-                btn_an
-            ]
+            answerButtons: answerButtons
         }
         // exit button
         var exitButton = makeElement('button', 'Exit article quiz', [classNames.exitButton])
@@ -109,8 +111,17 @@ var APP = function() {
 
     function handleAnswer(chosenArticle) {
         if (!currentField) return
+        interface.answerPanel.answerButtons[chosenArticle].classList.add(classNames.answerOptionButtonPressed)
+        if (chosenArticle === currentField.dataset.truth) {
+            if (!currentField.classList.contains(classNames.wrongAnswer)) {
+                currentField.classList.add(classNames.rightAnswer)
+            }
+            selectNextField()
+        }
+        else {
+            currentField.classList.add(classNames.wrongAnswer)
+        }
         console.log(chosenArticle)
-        selectNextField()
     }
 
     function endQuiz() {
