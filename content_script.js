@@ -30,7 +30,8 @@ var APP = function() {
             an: 'my-extension-option-an'
         },
         articleField: 'my-extension-field',
-        articleFieldFocused: 'my-extension-field-focused'
+        articleFieldFocused: 'my-extension-field-focused',
+        exitButton: 'my-extension-exit-btn'
     }
     const articleRegexes = {
         the: /(^|\s)(The )|( the )/g,
@@ -64,13 +65,19 @@ var APP = function() {
                 btn_an
             ]
         }
+        // exit button
+        var exitButton = makeElement('button', 'Exit article quiz', [classNames.exitButton])
+        interface.exitButton = {
+            el: exitButton,
+            present: false
+        }
+        exitButton.addEventListener('click', exitWithoutATrace)
     }
 
     function removeInterface() {
         Object.keys(interface).forEach(key => {
             setInterfaceElementPresence(interface[key], false)
         })
-        interface = {}
     }
 
     function setInterfaceElementPresence(interfaceObj, present) {
@@ -108,11 +115,12 @@ var APP = function() {
     function handleSelection(selectedElement) {
         highlightTarget(null)
         document.removeEventListener('mouseover', documentMouseoverHandler)
-        setInterfaceElementPresence(interface.selectionMessage, false)
+        removeInterface() // to get original innerHTML (if selection is document.body)
         selection.el = selectedElement
         selection.innerHTML_backup = selectedElement.innerHTML
         insertFields(selectedElement)
         setInterfaceElementPresence(interface.answerPanel, true)
+        setInterfaceElementPresence(interface.exitButton, true)
     }
     
 
@@ -127,11 +135,16 @@ var APP = function() {
     }()
 
     function documentMouseoverHandler(e) {
-        highlightTarget(e.target)
+        if (Object.keys(interface).every(key => interface[key].el !== e.target)) {
+            highlightTarget(e.target)
+        }
     }
 
     function documentClickHandler(e) {
-        handleSelection(e.target)
+        if (Object.keys(interface).every(key => interface[key].el !== e.target)) {
+            handleSelection(e.target)
+            document.removeEventListener('click', documentClickHandler)
+        }
     }
 
     function start() {
@@ -139,6 +152,7 @@ var APP = function() {
         // set up interface
         initInterface()
         setInterfaceElementPresence(interface.selectionMessage, true)
+        setInterfaceElementPresence(interface.exitButton, true)
         // add listeners
         document.addEventListener('mouseover', documentMouseoverHandler)
         document.addEventListener('click', documentClickHandler)

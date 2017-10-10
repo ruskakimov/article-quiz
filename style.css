@@ -104,3 +104,12 @@
 .my-extension-option-an:before {
     content: 'c';
 }
+
+.my-extension-exit-btn {
+    position: fixed;
+    top: 0;
+    right: 0;
+    border: none;
+    color: white;
+    background: black;
+}
