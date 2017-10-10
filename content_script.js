@@ -20,7 +20,56 @@ function makeElement(tagName, text, classNames) {
 var APP = function() {
     // private attrs
     var classNames = {
-        highlightedSelection: 'my-extension-outline'
+        highlightedSelection: 'my-extension-outline',
+        selectionMessage: 'my-extension-message',
+        answerPanel: 'my-extension-panel',
+        answerOptionButton: 'my-extension-option-button',
+        optionClasses: {
+            the: 'my-extension-option-the',
+            a: 'my-extension-option-a',
+            an: 'my-extension-option-an'
+        }
+    }
+    var interface = {}
+
+    function insertInterface() {
+        // selection message
+        var msg = makeElement('div', 'Select element', [classNames.selectionMessage])
+        document.body.appendChild(msg)
+        interface.selectionMessage = {
+            domEl: msg,
+            visible: true
+        }
+        // answer options panel
+        var answerPanel = makeElement('div', null, [classNames.answerPanel])
+        var btn_the = makeElement('button', 'the', [classNames.answerOptionButton, classNames.optionClasses.the])
+        var btn_a   = makeElement('button', 'a',   [classNames.answerOptionButton, classNames.optionClasses.a])
+        var btn_an  = makeElement('button', 'an',  [classNames.answerOptionButton, classNames.optionClasses.an])
+        answerPanel.appendChild(btn_the)
+        answerPanel.appendChild(btn_a)
+        answerPanel.appendChild(btn_an)
+        document.body.appendChild(answerPanel)
+        interface.answerPanel = {
+            domEl: answerPanel,
+            visible: true,
+            children: [
+                btn_the,
+                btn_a,
+                btn_an
+            ]
+        }
+    }
+
+    function setInterfaceVisibility(interfaceObj, newState) {
+        if (interfaceObj.visible !== newState) {
+            if (interfaceObj.visible) {
+                interfaceObj.domEl.style.visibility = 'hidden'
+            }
+            else {
+                interfaceObj.domEl.style.visibility = 'visible'
+            }
+            interfaceObj.visible = newState
+        }
     }
 
     var highlightTarget = function() {
@@ -40,11 +89,14 @@ var APP = function() {
     function documentClickHandler(e) {
         highlightTarget(null)
         document.removeEventListener('mouseover', documentMouseoverHandler)
-        exitWithoutATrace()
+        setInterfaceVisibility(interface.selectionMessage, false)
+        setInterfaceVisibility(interface.answerPanel, true)
     }
 
     function start() {
         console.log('started app')
+        insertInterface()
+        setInterfaceVisibility(interface.answerPanel, false)
         document.addEventListener('mouseover', documentMouseoverHandler)
         document.addEventListener('click', documentClickHandler)
         chrome.runtime.sendMessage({opened: true})
@@ -55,8 +107,8 @@ var APP = function() {
         highlightTarget(null)
         document.removeEventListener('mouseover', documentMouseoverHandler)
         document.removeEventListener('click', documentClickHandler)
-        chrome.runtime.sendMessage({closed: true})
         chrome.runtime.onMessage.removeListener(messageHandler)
+        chrome.runtime.sendMessage({closed: true})
     }
 
     return {
