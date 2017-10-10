@@ -22,6 +22,7 @@ var APP = function() {
     const classNames = {
         highlightedSelection: 'my-extension-outline',
         selectionMessage: 'my-extension-message',
+        button: 'my-extension-button',
         answerPanel: 'my-extension-panel',
         answerOptionButton: 'my-extension-option-button',
         answerOptionButtonPressed: 'my-extension-option-button-pressed',
@@ -58,7 +59,11 @@ var APP = function() {
         // answer options panel
         var answerPanel = makeElement('div', null, [classNames.answerPanel])
         const answerButtons = articles.reduce((obj, article) => {
-            obj[article] = makeElement('button', article, [classNames.answerOptionButton, classNames.optionClasses[article]])
+            obj[article] = makeElement('button', article, [
+                classNames.button,
+                classNames.answerOptionButton,
+                classNames.optionClasses[article]
+            ])
             return obj
         }, {})
         articles.forEach(article => {
@@ -75,7 +80,11 @@ var APP = function() {
             answerButtons: answerButtons
         }
         // exit button
-        var exitButton = makeElement('button', 'Exit article quiz', [classNames.exitButton])
+        var exitButton = makeElement('button', 'X', [
+            classNames.button,
+            classNames.exitButton,
+            classNames.answerOptionButton
+        ])
         interface.exitButton = {
             el: exitButton,
             present: false
@@ -166,9 +175,9 @@ var APP = function() {
         selection.el = selectedElement
         selection.innerHTML_backup = selectedElement.innerHTML
         insertFields(selectedElement)
-        selectNextField()
         setInterfaceElementPresence(interface.answerPanel, true)
         setInterfaceElementPresence(interface.exitButton, true)
+        selectNextField()
     }
     
 

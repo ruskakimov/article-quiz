@@ -25,15 +25,14 @@
 .my-extension-message {
     position: fixed;
     top: 0;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
+    /* left: 50%;
+    transform: translateX(-50%); */
     z-index: 999999999;
-    color: #f55;
-    font: 2rem Verdana, sans-serif;
-    padding: 1rem 2rem;
-    background: white;
-    border: 5px solid #faa;
-    border-top-width: 0;
+    font: 32px Arial, Helvetica, sans-serif;
+    padding: 0.5em 0.5em 0.5em 2em;
+    color: #faa;
+    background: #555;
 }
 
 .my-extension-panel {
@@ -43,52 +42,52 @@
     left: 50%;
     transform: translateX(-50%);
 }
-.my-extension-option-button {
+.my-extension-button {
     margin: 20px;
     padding: 0;
     width: 100px;
     height: 100px;
-    border: 7px solid #888;
     border-radius: 50%;
-    background: #eee;
-    color: #888;
     font-size: 40px;
     font-weight: bold;
+    font-family: Arial, Helvetica, sans-serif;
     text-align: center;
-    position: relative;
-    box-shadow: none;
-    transition: all .1s ease-in;
-    box-shadow: rgba(0,0,0,0.7) 0 12px 15px 0px;
+    background: #eee;
+    border: 7px solid #888;
 }
-.my-extension-option-button:hover {
+.my-extension-button:hover {
     cursor: pointer;
 }
-.my-extension-option-button:focus {
+.my-extension-button:focus {
     outline: none;
+}
+.my-extension-option-button {
+    color: #888;
+    position: relative;
+    transition: all .1s ease-in;
 }
 .my-extension-option-button:before {
     display: block;
     position: absolute;
-    top: -2px;
+    bottom: 0;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, 50%);
     color: #222;
     background: #eee;
     width: 25px;
     height: 25px;
     font: 18px monospace;
     border-radius: 5px;
+    border: 1px solid #aaa;
     box-shadow: 0 2px 0px 1px #aaa;
-}
-.my-extension-option-button-pressed {
-    transform: translateY(10px);
-    box-shadow: 0 0 5px 0px #555;
 }
 .my-extension-option-button-true {
     background: #afa;
 }
 .my-extension-option-button-false {
     background: #faa;
+}
+.my-extension-option-button-pressed {
 }
 .my-extension-option-button-true.my-extension-option-button-pressed {
     border-color: #393;
@@ -109,10 +108,10 @@
 }
 
 .my-extension-exit-btn {
+    z-index: 999999999;
     position: fixed;
-    top: 0;
+    bottom: 0;
     right: 0;
-    border: none;
-    color: white;
-    background: black;
+    border-color: #555;
+    color: #555;
 }
