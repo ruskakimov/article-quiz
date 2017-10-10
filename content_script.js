@@ -117,7 +117,10 @@ var APP = function() {
             currentField.classList.remove(classNames.articleFieldFocused)
         }
         currentField = document.querySelector('.' + classNames.articleField)
-        if (currentField) currentField.classList.add(classNames.articleFieldFocused)
+        if (currentField) {
+            currentField.classList.add(classNames.articleFieldFocused)
+            currentField.scrollIntoViewIfNeeded()
+        }
         else endQuiz()
     }
 
