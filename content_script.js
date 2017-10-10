@@ -40,6 +40,7 @@ var APP = function() {
     }
     var selection = {}
     var interface = {}
+    var currentField = null
 
     function initInterface() {
         // selection message
@@ -53,6 +54,9 @@ var APP = function() {
         var btn_the = makeElement('button', 'the', [classNames.answerOptionButton, classNames.optionClasses.the])
         var btn_a   = makeElement('button', 'a',   [classNames.answerOptionButton, classNames.optionClasses.a])
         var btn_an  = makeElement('button', 'an',  [classNames.answerOptionButton, classNames.optionClasses.an])
+        btn_the.addEventListener('click', makeAnswerHandler('the'))
+        btn_a.addEventListener('click', makeAnswerHandler('a'))
+        btn_an.addEventListener('click', makeAnswerHandler('an'))
         answerPanel.appendChild(btn_the)
         answerPanel.appendChild(btn_a)
         answerPanel.appendChild(btn_an)
@@ -92,6 +96,28 @@ var APP = function() {
         }
     }
 
+    function selectNextField() {
+        if (currentField) {
+            currentField.innerText = currentField.dataset.original
+            currentField.classList.remove(classNames.articleField)
+            currentField.classList.remove(classNames.articleFieldFocused)
+        }
+        currentField = document.querySelector('.' + classNames.articleField)
+        if (currentField) currentField.classList.add(classNames.articleFieldFocused)
+        else endQuiz()
+    }
+
+    function makeAnswerHandler(chosenArticle) {
+        return function(e) {
+            console.log(chosenArticle)
+            selectNextField()
+        }
+    }
+
+    function endQuiz() {
+        setInterfaceElementPresence(interface.answerPanel, false)
+    }
+
     /**
      * @param {string} article 
      */
@@ -119,6 +145,7 @@ var APP = function() {
         selection.el = selectedElement
         selection.innerHTML_backup = selectedElement.innerHTML
         insertFields(selectedElement)
+        selectNextField()
         setInterfaceElementPresence(interface.answerPanel, true)
         setInterfaceElementPresence(interface.exitButton, true)
     }
