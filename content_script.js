@@ -28,7 +28,14 @@ var APP = function() {
             the: 'my-extension-option-the',
             a: 'my-extension-option-a',
             an: 'my-extension-option-an'
-        }
+        },
+        articleField: 'my-extension-field',
+        articleFieldFocused: 'my-extension-field-focused'
+    }
+    const articleRegexes = {
+        the: /(^|\s)(The )|( the )/g,
+        a: /(^|\s)(A )|( a )/g,
+        an: /(^|\s)(An )|( an )/g
     }
     var interface = {}
 
@@ -67,7 +74,7 @@ var APP = function() {
         interface = {}
     }
 
-    function setInterfaceVisibility(interfaceObj, newState) {
+    function setInterfaceElementVisibility(interfaceObj, newState) {
         if (interfaceObj.visible !== newState) {
             if (interfaceObj.visible) {
                 interfaceObj.domEl.style.visibility = 'hidden'
@@ -76,6 +83,26 @@ var APP = function() {
                 interfaceObj.domEl.style.visibility = 'visible'
             }
             interfaceObj.visible = newState
+        }
+    }
+
+    /**
+     * @param {string} article 
+     */
+    function makeFieldHTML(article) {
+        return `<span class="${classNames.articleField}" data-truth="${article}" data-original="$&"> _ </span>`
+    }
+    
+    function insertFields(element) {
+        if (element.tagName === "P") {
+            var modif = element.innerText
+            modif = modif.replace(articleRegexes.the, makeFieldHTML('the'))
+            modif = modif.replace(articleRegexes.a, makeFieldHTML('a'))
+            modif = modif.replace(articleRegexes.an, makeFieldHTML('an'))
+            element.innerHTML = modif
+        }
+        else if (element.children) {
+            Array.prototype.forEach.call(element.children, child => insertFields(child))
         }
     }
 
@@ -96,14 +123,15 @@ var APP = function() {
     function documentClickHandler(e) {
         highlightTarget(null)
         document.removeEventListener('mouseover', documentMouseoverHandler)
-        setInterfaceVisibility(interface.selectionMessage, false)
-        setInterfaceVisibility(interface.answerPanel, true)
+        insertFields(e.target)
+        setInterfaceElementVisibility(interface.selectionMessage, false)
+        setInterfaceElementVisibility(interface.answerPanel, true)
     }
 
     function start() {
         console.log('started app')
         insertInterface()
-        setInterfaceVisibility(interface.answerPanel, false)
+        setInterfaceElementVisibility(interface.answerPanel, false)
         document.addEventListener('mouseover', documentMouseoverHandler)
         document.addEventListener('click', documentClickHandler)
         chrome.runtime.sendMessage({opened: true})
