@@ -19,7 +19,7 @@ function makeElement(tagName, text, classNames) {
 
 var APP = function() {
     // private attrs
-    var classNames = {
+    const classNames = {
         highlightedSelection: 'my-extension-outline',
         selectionMessage: 'my-extension-message',
         answerPanel: 'my-extension-panel',
@@ -37,15 +37,15 @@ var APP = function() {
         a: /(^|\s)(A )|( a )/g,
         an: /(^|\s)(An )|( an )/g
     }
+    var selection = {}
     var interface = {}
 
-    function insertInterface() {
+    function initInterface() {
         // selection message
         var msg = makeElement('div', 'Select element', [classNames.selectionMessage])
-        document.body.appendChild(msg)
         interface.selectionMessage = {
-            domEl: msg,
-            visible: true
+            el: msg,
+            present: false
         }
         // answer options panel
         var answerPanel = makeElement('div', null, [classNames.answerPanel])
@@ -55,10 +55,9 @@ var APP = function() {
         answerPanel.appendChild(btn_the)
         answerPanel.appendChild(btn_a)
         answerPanel.appendChild(btn_an)
-        document.body.appendChild(answerPanel)
         interface.answerPanel = {
-            domEl: answerPanel,
-            visible: true,
+            el: answerPanel,
+            present: false,
             children: [
                 btn_the,
                 btn_a,
@@ -69,20 +68,20 @@ var APP = function() {
 
     function removeInterface() {
         Object.keys(interface).forEach(key => {
-            interface[key].domEl.parentElement.removeChild(interface[key].domEl)
+            setInterfaceElementPresence(interface[key], false)
         })
         interface = {}
     }
 
-    function setInterfaceElementVisibility(interfaceObj, newState) {
-        if (interfaceObj.visible !== newState) {
-            if (interfaceObj.visible) {
-                interfaceObj.domEl.style.visibility = 'hidden'
+    function setInterfaceElementPresence(interfaceObj, present) {
+        if (interfaceObj.present !== present) {
+            if (interfaceObj.present) {
+                interfaceObj.el.parentElement.removeChild(interfaceObj.el)
             }
             else {
-                interfaceObj.domEl.style.visibility = 'visible'
+                document.body.appendChild(interfaceObj.el)
             }
-            interfaceObj.visible = newState
+            interfaceObj.present = present
         }
     }
 
@@ -106,6 +105,17 @@ var APP = function() {
         }
     }
 
+    function handleSelection(selectedElement) {
+        highlightTarget(null)
+        document.removeEventListener('mouseover', documentMouseoverHandler)
+        setInterfaceElementPresence(interface.selectionMessage, false)
+        selection.el = selectedElement
+        selection.innerHTML_backup = selectedElement.innerHTML
+        insertFields(selectedElement)
+        setInterfaceElementPresence(interface.answerPanel, true)
+    }
+    
+
     var highlightTarget = function() {
         var className = classNames.highlightedSelection
         var lastEl = null
@@ -121,29 +131,32 @@ var APP = function() {
     }
 
     function documentClickHandler(e) {
-        highlightTarget(null)
-        document.removeEventListener('mouseover', documentMouseoverHandler)
-        insertFields(e.target)
-        setInterfaceElementVisibility(interface.selectionMessage, false)
-        setInterfaceElementVisibility(interface.answerPanel, true)
+        handleSelection(e.target)
     }
 
     function start() {
         console.log('started app')
-        insertInterface()
-        setInterfaceElementVisibility(interface.answerPanel, false)
+        // set up interface
+        initInterface()
+        setInterfaceElementPresence(interface.selectionMessage, true)
+        // add listeners
         document.addEventListener('mouseover', documentMouseoverHandler)
         document.addEventListener('click', documentClickHandler)
+        // notify background script
         chrome.runtime.sendMessage({opened: true})
     }
 
     function exitWithoutATrace() {
         console.log('reverting DOM modifications & removing listeners')
+        // revert DOM
         highlightTarget(null)
+        removeInterface()
+        if (selection.el) selection.el.innerHTML = selection.innerHTML_backup
+        // remove listeners
         document.removeEventListener('mouseover', documentMouseoverHandler)
         document.removeEventListener('click', documentClickHandler)
         chrome.runtime.onMessage.removeListener(messageHandler)
-        removeInterface()
+        // notify background script
         chrome.runtime.sendMessage({closed: true})
     }
 
