@@ -60,6 +60,13 @@ var APP = function() {
         }
     }
 
+    function removeInterface() {
+        Object.keys(interface).forEach(key => {
+            interface[key].domEl.parentElement.removeChild(interface[key].domEl)
+        })
+        interface = {}
+    }
+
     function setInterfaceVisibility(interfaceObj, newState) {
         if (interfaceObj.visible !== newState) {
             if (interfaceObj.visible) {
@@ -108,6 +115,7 @@ var APP = function() {
         document.removeEventListener('mouseover', documentMouseoverHandler)
         document.removeEventListener('click', documentClickHandler)
         chrome.runtime.onMessage.removeListener(messageHandler)
+        removeInterface()
         chrome.runtime.sendMessage({closed: true})
     }
 
