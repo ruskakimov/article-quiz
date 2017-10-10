@@ -25,8 +25,8 @@ var APP = function() {
         answerPanel: 'my-extension-panel',
         answerOptionButton: 'my-extension-option-button',
         answerOptionButtonPressed: 'my-extension-option-button-pressed',
-        answerOptionButtonFalse: 'my-extension-option-button-false',
         answerOptionButtonTrue: 'my-extension-option-button-true',
+        answerOptionButtonFalse: 'my-extension-option-button-false',
         optionClasses: {
             the: 'my-extension-option-the',
             a: 'my-extension-option-a',
@@ -43,6 +43,7 @@ var APP = function() {
         a: /(^|\s)(A )|( a )/g,
         an: /(^|\s)(An )|( an )/g
     }
+    const articles = ['the', 'a', 'an']
     var selection = {}
     var interface = {}
     var currentField = null
@@ -56,14 +57,16 @@ var APP = function() {
         }
         // answer options panel
         var answerPanel = makeElement('div', null, [classNames.answerPanel])
-        const articles = ['the', 'a', 'an']
         const answerButtons = articles.reduce((obj, article) => {
             obj[article] = makeElement('button', article, [classNames.answerOptionButton, classNames.optionClasses[article]])
             return obj
         }, {})
         articles.forEach(article => {
             answerButtons[article].addEventListener('click', e => handleAnswer(article))
-            answerButtons[article].addEventListener('transitionend', e => e.target.classList.remove(classNames.answerOptionButtonPressed))
+            answerButtons[article].addEventListener('transitionend', e => {
+                e.target.classList.remove(classNames.answerOptionButtonPressed)
+                e.target.classList.remove(classNames.answerOptionButtonTrue)
+            })
             answerPanel.appendChild(answerButtons[article])
         })
         interface.answerPanel = {
@@ -109,19 +112,27 @@ var APP = function() {
         else endQuiz()
     }
 
+    function resetAnswerButtonsStyle() {
+        articles.forEach(article => {
+            interface.answerPanel.answerButtons[article].classList.remove(classNames.answerOptionButtonFalse)
+        })
+    }
+
     function handleAnswer(chosenArticle) {
         if (!currentField) return
-        interface.answerPanel.answerButtons[chosenArticle].classList.add(classNames.answerOptionButtonPressed)
         if (chosenArticle === currentField.dataset.truth) {
             if (!currentField.classList.contains(classNames.wrongAnswer)) {
                 currentField.classList.add(classNames.rightAnswer)
             }
+            resetAnswerButtonsStyle()
+            interface.answerPanel.answerButtons[chosenArticle].classList.add(classNames.answerOptionButtonTrue)
             selectNextField()
         }
         else {
             currentField.classList.add(classNames.wrongAnswer)
+            interface.answerPanel.answerButtons[chosenArticle].classList.add(classNames.answerOptionButtonFalse)
         }
-        console.log(chosenArticle)
+        interface.answerPanel.answerButtons[chosenArticle].classList.add(classNames.answerOptionButtonPressed)
     }
 
     function endQuiz() {
