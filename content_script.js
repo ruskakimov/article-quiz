@@ -46,6 +46,9 @@ var APP = function() {
     var interface = {}
     var currentField = null
 
+    /*
+        INTERFACE
+    */
     function initInterface() {
         // answer options panel
         var answerPanel = makeElement('div', null, [classNames.answerPanel])
@@ -83,12 +86,6 @@ var APP = function() {
         exitButton.addEventListener('click', exitWithoutATrace)
     }
 
-    function removeInterface() {
-        Object.keys(interface).forEach(key => {
-            setInterfaceElementPresence(interface[key], false)
-        })
-    }
-
     function setInterfaceElementPresence(interfaceObj, present) {
         if (interfaceObj.present !== present) {
             if (interfaceObj.present) {
@@ -101,18 +98,10 @@ var APP = function() {
         }
     }
 
-    function selectNextField() {
-        if (currentField) {
-            currentField.innerText = currentField.dataset.original
-            currentField.classList.remove(classNames.articleField)
-            currentField.classList.remove(classNames.articleFieldFocused)
-        }
-        currentField = document.querySelector('.' + classNames.articleField)
-        if (currentField) {
-            currentField.classList.add(classNames.articleFieldFocused)
-            currentField.scrollIntoViewIfNeeded()
-        }
-        else endQuiz()
+    function removeInterface() {
+        Object.keys(interface).forEach(key => {
+            setInterfaceElementPresence(interface[key], false)
+        })
     }
 
     function resetAnswerButtonsStyle() {
@@ -121,6 +110,10 @@ var APP = function() {
         })
     }
 
+
+    /*
+        USER INTERACTION LOGIC
+    */
     function handleAnswer(chosenArticle) {
         if (!currentField) return
         if (chosenArticle === currentField.dataset.truth) {
@@ -138,18 +131,14 @@ var APP = function() {
         interface.answerPanel.answerButtons[chosenArticle].classList.add(classNames.answerOptionButtonPressed)
     }
 
-    function endQuiz() {
-        setInterfaceElementPresence(interface.answerPanel, false)
-    }
 
-    /**
-     * @param {string} article 
-     */
-    function makeFieldHTML(article) {
-        return `<span class="${classNames.articleField}" data-truth="${article}" data-original="$&"> _ </span>`
-    }
-
+    /*
+        INSERTING QUIZ FIELDS
+    */
     function replaceArticles(text) {
+        function makeFieldHTML(article) {
+            return `<span class="${classNames.articleField}" data-truth="${article}" data-original="$&"> _ </span>`
+        }
         text = text.replace(articleRegexes.the, makeFieldHTML('the'))
         text = text.replace(articleRegexes.a, makeFieldHTML('a'))
         text = text.replace(articleRegexes.an, makeFieldHTML('an'))
@@ -181,20 +170,47 @@ var APP = function() {
         }
     }
 
+    
+    /*
+        APP FLOW OPERATIONS
+    */
     function setupQuiz() {
         insertFields(document.body)
         setInterfaceElementPresence(interface.answerPanel, true)
         setInterfaceElementPresence(interface.exitButton, true)
         selectNextField()
     }
-    
-    function documentClickHandler(e) {
-        if (Object.keys(interface).every(key => interface[key].el !== e.target)) {
-            handleSelection(e.target)
-            document.removeEventListener('click', documentClickHandler)
+
+    function selectNextField() {
+        if (currentField) {
+            currentField.innerText = currentField.dataset.original
+            currentField.classList.remove(classNames.articleField)
+            currentField.classList.remove(classNames.articleFieldFocused)
         }
+        currentField = document.querySelector('.' + classNames.articleField)
+        if (currentField) {
+            currentField.classList.add(classNames.articleFieldFocused)
+            currentField.scrollIntoViewIfNeeded()
+        }
+        else endQuiz()
     }
 
+    function endQuiz() {
+        setInterfaceElementPresence(interface.answerPanel, false)
+    }
+
+    function exitWithoutATrace() {
+        removeInterface()
+        document.removeEventListener('keypress', documentKeypressHandler)
+        chrome.runtime.onMessage.removeListener(messageHandler)
+        chrome.runtime.sendMessage({closed: true})
+        window.location.reload(false)
+    }
+
+
+    /*
+        DOCUMENT EVENT HANDLERS
+    */
     function documentKeypressHandler(e) {
         switch (e.code) {
             case 'KeyZ':
@@ -209,30 +225,16 @@ var APP = function() {
         }
     }
 
-    function start() {
-        console.log('started app')
-        initInterface()
-        setupQuiz()
-        // add listeners
-        document.addEventListener('keypress', documentKeypressHandler)
-        // notify background script
-        chrome.runtime.sendMessage({opened: true})
-    }
-
-    function exitWithoutATrace() {
-        // revert DOM
-        removeInterface()
-        // remove listeners
-        document.removeEventListener('keypress', documentKeypressHandler)
-        chrome.runtime.onMessage.removeListener(messageHandler)
-        // notify background script
-        chrome.runtime.sendMessage({closed: true})
-        window.location.reload(false)
-    }
-
     return {
-        // public attrs
-        start, exitWithoutATrace
+        // public API
+        start:  function() {
+            console.log('started app')
+            initInterface()
+            setupQuiz()
+            document.addEventListener('keypress', documentKeypressHandler)
+            chrome.runtime.sendMessage({opened: true})
+        },
+        exitWithoutATrace
     }
 }()
 
@@ -246,7 +248,7 @@ function DOMisReady() {
     return new Promise(function (resolve) {
         if (document.readyState === 'interactive' || document.readyState === 'complete') resolve()
         else {
-            document.addEventListener('DOMContentLoaded', function (e) {
+            document.addEventListener('DOMContentLoaded', function listenerWithSelfDestruct(e) {
                 resolve()
                 document.removeEventListener('DOMContentLoaded', listenerWithSelfDestruct)
             })
