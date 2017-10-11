@@ -3,7 +3,7 @@
     
       "name": "English articles quiz",
       "description": "Guess english articles (a/an/the) in the current document.",
-      "version": "1.0",
+      "version": "1.1",
     
       "permissions": [
         "activeTab"
