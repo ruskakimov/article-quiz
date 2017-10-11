@@ -1,6 +1,22 @@
-.my-extension-field {
+/* selection stage */
+._article_quiz__outline {
+    outline: 3px solid #faa;
+    background: #fee;
 }
-.my-extension-field-focused {
+._article_quiz__message {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 999999999;
+    padding: 0.5em;
+    font: 32px Arial, Helvetica, sans-serif;
+    color: #faa;
+    background: #555;
+}
+
+
+/* article field */
+._article_quiz__field-focused {
     background: yellow !important;
     animation: blink-animation 1s linear infinite;
 }
@@ -9,40 +25,16 @@
         background: transparent;
     }
 }
-
-.my-extension-true {
+._article_quiz__field-right {
     background: #afa;
 }
-.my-extension-false {
+._article_quiz__field-wrong {
     background: #faa;
 }
 
-.my-extension-outline {
-    outline: 3px solid #faa;
-    background: #fee;
-}
 
-.my-extension-message {
-    position: fixed;
-    top: 0;
-    left: 0;
-    /* left: 50%;
-    transform: translateX(-50%); */
-    z-index: 999999999;
-    font: 32px Arial, Helvetica, sans-serif;
-    padding: 0.5em 0.5em 0.5em 2em;
-    color: #faa;
-    background: #555;
-}
-
-.my-extension-panel {
-    position: fixed;
-    z-index: 999999999;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-}
-.my-extension-button {
+/* general interface styles */
+._article_quiz__button {
     margin: 20px;
     padding: 0;
     width: 100px;
@@ -55,18 +47,28 @@
     background: #eee;
     border: 7px solid #888;
 }
-.my-extension-button:hover {
+._article_quiz__button:hover {
     cursor: pointer;
 }
-.my-extension-button:focus {
+._article_quiz__button:focus {
     outline: none;
 }
-.my-extension-option-button {
+
+
+/* answer panel and option buttons */
+._article_quiz__answer-panel {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    z-index: 999999999;
+    transform: translateX(-50%);
+}
+._article_quiz__option-button {
     color: #888;
     position: relative;
     transition: all .1s ease-in;
 }
-.my-extension-option-button:before {
+._article_quiz__option-button:before {
     display: block;
     position: absolute;
     bottom: 0;
@@ -81,37 +83,37 @@
     border: 1px solid #aaa;
     box-shadow: 0 2px 0px 1px #aaa;
 }
-.my-extension-option-button-true {
+._article_quiz__option-button-true {
     background: #afa;
 }
-.my-extension-option-button-false {
+._article_quiz__option-button-false {
     background: #faa;
 }
-.my-extension-option-button-pressed {
-}
-.my-extension-option-button-true.my-extension-option-button-pressed {
+._article_quiz__option-button-true._article_quiz__option-button-pressed {
     border-color: #393;
     color: #393;
 }
-.my-extension-option-button-false.my-extension-option-button-pressed {
+._article_quiz__option-button-false._article_quiz__option-button-pressed {
     border-color: #f33;
     color: #f33;
 }
-.my-extension-option-the:before {
+._article_quiz__option-the:before {
     content: 'z';
 }
-.my-extension-option-a:before {
+._article_quiz__option-a:before {
     content: 'x';
 }
-.my-extension-option-an:before {
+._article_quiz__option-an:before {
     content: 'c';
 }
 
-.my-extension-exit-btn {
-    z-index: 999999999;
+
+/* exit button */
+._article_quiz__exit-btn {
     position: fixed;
     bottom: 0;
     right: 0;
+    z-index: 999999999;
     border-color: #555;
     color: #555;
 }

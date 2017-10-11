@@ -20,24 +20,24 @@ function makeElement(tagName, text, classNames) {
 var APP = function() {
     // private attrs
     const classNames = {
-        highlightedSelection: 'my-extension-outline',
-        selectionMessage: 'my-extension-message',
-        button: 'my-extension-button',
-        answerPanel: 'my-extension-panel',
-        answerOptionButton: 'my-extension-option-button',
-        answerOptionButtonPressed: 'my-extension-option-button-pressed',
-        answerOptionButtonTrue: 'my-extension-option-button-true',
-        answerOptionButtonFalse: 'my-extension-option-button-false',
+        highlightedSelection: '_article_quiz__outline',
+        selectionMessage: '_article_quiz__message',
+        button: '_article_quiz__button',
+        answerPanel: '_article_quiz__answer-panel',
+        answerOptionButton: '_article_quiz__option-button',
+        answerOptionButtonPressed: '_article_quiz__option-button-pressed',
+        answerOptionButtonTrue: '_article_quiz__option-button-true',
+        answerOptionButtonFalse: '_article_quiz__option-button-false',
         optionClasses: {
-            the: 'my-extension-option-the',
-            a: 'my-extension-option-a',
-            an: 'my-extension-option-an'
+            the: '_article_quiz__option-the',
+            a: '_article_quiz__option-a',
+            an: '_article_quiz__option-an'
         },
-        articleField: 'my-extension-field',
-        articleFieldFocused: 'my-extension-field-focused',
-        rightAnswer: 'my-extension-true',
-        wrongAnswer: 'my-extension-false',
-        exitButton: 'my-extension-exit-btn'
+        articleField: '_article_quiz__field',
+        articleFieldFocused: '_article_quiz__field-focused',
+        articleFieldRight: '_article_quiz__field-right',
+        articleFieldWrong: '_article_quiz__field-wrong',
+        exitButton: '_article_quiz__exit-btn'
     }
     const articleRegexes = {
         the: /(^|\s)(The )|( the )/g,
@@ -51,7 +51,7 @@ var APP = function() {
 
     function initInterface() {
         // selection message
-        var msg = makeElement('div', 'Select element', [classNames.selectionMessage])
+        var msg = makeElement('div', 'Select an element', [classNames.selectionMessage])
         interface.selectionMessage = {
             el: msg,
             present: false
@@ -133,15 +133,15 @@ var APP = function() {
     function handleAnswer(chosenArticle) {
         if (!currentField) return
         if (chosenArticle === currentField.dataset.truth) {
-            if (!currentField.classList.contains(classNames.wrongAnswer)) {
-                currentField.classList.add(classNames.rightAnswer)
+            if (!currentField.classList.contains(classNames.articleFieldWrong)) {
+                currentField.classList.add(classNames.articleFieldRight)
             }
             resetAnswerButtonsStyle()
             interface.answerPanel.answerButtons[chosenArticle].classList.add(classNames.answerOptionButtonTrue)
             selectNextField()
         }
         else {
-            currentField.classList.add(classNames.wrongAnswer)
+            currentField.classList.add(classNames.articleFieldWrong)
             interface.answerPanel.answerButtons[chosenArticle].classList.add(classNames.answerOptionButtonFalse)
         }
         interface.answerPanel.answerButtons[chosenArticle].classList.add(classNames.answerOptionButtonPressed)
