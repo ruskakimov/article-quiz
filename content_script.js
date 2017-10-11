@@ -20,8 +20,6 @@ function makeElement(tagName, text, classNames) {
 var APP = function() {
     // private attrs
     const classNames = {
-        highlightedSelection: '_article_quiz__outline',
-        selectionMessage: '_article_quiz__message',
         button: '_article_quiz__button',
         answerPanel: '_article_quiz__answer-panel',
         answerOptionButton: '_article_quiz__option-button',
@@ -45,17 +43,11 @@ var APP = function() {
         an: /(^|\s)(An )|( an )/g
     }
     const articles = ['the', 'a', 'an']
-    var selection = {}
+    var innerHTML_backup = ''
     var interface = {}
     var currentField = null
 
     function initInterface() {
-        // selection message
-        var msg = makeElement('div', 'Select an element', [classNames.selectionMessage])
-        interface.selectionMessage = {
-            el: msg,
-            present: false
-        }
         // answer options panel
         var answerPanel = makeElement('div', null, [classNames.answerPanel])
         const answerButtons = articles.reduce((obj, article) => {
@@ -186,35 +178,14 @@ var APP = function() {
         }
     }
 
-    function handleSelection(selectedElement) {
-        highlightTarget(null)
-        document.removeEventListener('mouseover', documentMouseoverHandler)
-        removeInterface() // to get original innerHTML (if selection is document.body)
-        selection.el = selectedElement
-        selection.innerHTML_backup = selectedElement.innerHTML
-        insertFields(selectedElement)
+    function setupQuiz() {
+        innerHTML_backup = document.body.innerHTML
+        insertFields(document.body)
         setInterfaceElementPresence(interface.answerPanel, true)
         setInterfaceElementPresence(interface.exitButton, true)
         selectNextField()
     }
     
-
-    var highlightTarget = function() {
-        var className = classNames.highlightedSelection
-        var lastEl = null
-        return function(targetEl) {
-            if (lastEl) lastEl.classList.remove(className)
-            if (targetEl) targetEl.classList.add(className)
-            lastEl = targetEl
-        }
-    }()
-
-    function documentMouseoverHandler(e) {
-        if (Object.keys(interface).every(key => interface[key].el !== e.target)) {
-            highlightTarget(e.target)
-        }
-    }
-
     function documentClickHandler(e) {
         if (Object.keys(interface).every(key => interface[key].el !== e.target)) {
             handleSelection(e.target)
@@ -238,10 +209,8 @@ var APP = function() {
 
     function start() {
         console.log('started app')
-        // set up interface
         initInterface()
-        setInterfaceElementPresence(interface.exitButton, true)
-        handleSelection(document.body)
+        setupQuiz()
         // add listeners
         document.addEventListener('keypress', documentKeypressHandler)
         // notify background script
@@ -251,12 +220,9 @@ var APP = function() {
     function exitWithoutATrace() {
         console.log('reverting DOM modifications & removing listeners')
         // revert DOM
-        highlightTarget(null)
         removeInterface()
-        if (selection.el) selection.el.innerHTML = selection.innerHTML_backup
+        if (innerHTML_backup) document.body.innerHTML = innerHTML_backup
         // remove listeners
-        document.removeEventListener('mouseover', documentMouseoverHandler)
-        document.removeEventListener('click', documentClickHandler)
         document.removeEventListener('keypress', documentKeypressHandler)
         chrome.runtime.onMessage.removeListener(messageHandler)
         // notify background script

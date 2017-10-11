@@ -1,20 +1,3 @@
-/* selection stage */
-._article_quiz__outline {
-    outline: 3px solid #faa;
-    background: #fee;
-}
-._article_quiz__message {
-    position: fixed;
-    top: 0;
-    right: 0;
-    z-index: 999999999;
-    padding: 0.5em;
-    font: 32px Arial, Helvetica, sans-serif;
-    color: #faa;
-    background: #555;
-}
-
-
 /* article field */
 ._article_quiz__field-focused {
     background: yellow !important;
