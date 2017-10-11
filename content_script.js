@@ -163,6 +163,10 @@ var APP = function() {
         {
             return
         }
+        if (node.nodeType === 1) { // element
+            var style = window.getComputedStyle(node)
+            if (style.display === 'none' || style.visibility === 'hidden') return
+        }
         if (node.nodeName === "#text") {
             var withFields = replaceArticles(node.textContent)
             if (withFields !== node.textContent) {
