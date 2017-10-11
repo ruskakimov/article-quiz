@@ -157,17 +157,32 @@ var APP = function() {
     function makeFieldHTML(article) {
         return `<span class="${classNames.articleField}" data-truth="${article}" data-original="$&"> _ </span>`
     }
+
+    function replaceArticles(text) {
+        text = text.replace(articleRegexes.the, makeFieldHTML('the'))
+        text = text.replace(articleRegexes.a, makeFieldHTML('a'))
+        text = text.replace(articleRegexes.an, makeFieldHTML('an'))
+        return text
+    }
     
-    function insertFields(element) {
-        if (element.tagName === "P") {
-            var modif = element.innerText
-            modif = modif.replace(articleRegexes.the, makeFieldHTML('the'))
-            modif = modif.replace(articleRegexes.a, makeFieldHTML('a'))
-            modif = modif.replace(articleRegexes.an, makeFieldHTML('an'))
-            element.innerHTML = modif
+    function insertFields(node) {
+        if (node.nodeName === '#comment' ||
+            node.nodeName === 'SCRIPT' ||
+            node.nodeName === 'STYLE')
+        {
+            return
         }
-        else if (element.children) {
-            Array.prototype.forEach.call(element.children, child => insertFields(child))
+        if (node.nodeName === "#text") {
+            var withFields = replaceArticles(node.textContent)
+            if (withFields !== node.textContent) {
+                var replacement = document.createElement('span')
+                replacement.innerHTML = withFields
+                node.parentNode.insertBefore(replacement, node)
+                node.parentNode.removeChild(node)
+            }
+        }
+        else if (node.children) {
+            Array.prototype.forEach.call(node.childNodes, node => insertFields(node))
         }
     }
 
@@ -225,11 +240,9 @@ var APP = function() {
         console.log('started app')
         // set up interface
         initInterface()
-        setInterfaceElementPresence(interface.selectionMessage, true)
         setInterfaceElementPresence(interface.exitButton, true)
+        handleSelection(document.body)
         // add listeners
-        document.addEventListener('mouseover', documentMouseoverHandler)
-        document.addEventListener('click', documentClickHandler)
         document.addEventListener('keypress', documentKeypressHandler)
         // notify background script
         chrome.runtime.sendMessage({opened: true})
@@ -264,11 +277,13 @@ function messageHandler(request, sender, sendResponse) {
 
 function DOMisReady() {
     return new Promise(function (resolve) {
-        if (document.readyState === 'complete') resolve()
-        else document.addEventListener('DOMContentLoaded', function listenerWithSelfDestruct() {
-            resolve()
-            document.removeEventListener('DOMContentLoaded', listenerWithSelfDestruct)
-        })
+        if (document.readyState === 'interactive' || document.readyState === 'complete') resolve()
+        else {
+            document.addEventListener('DOMContentLoaded', function (e) {
+                resolve()
+                document.removeEventListener('DOMContentLoaded', listenerWithSelfDestruct)
+            })
+        }
     })
 }
 

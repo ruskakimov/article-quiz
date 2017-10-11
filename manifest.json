@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     
-      "name": "Article quiz",
+      "name": "English articles quiz",
       "description": "Guess english articles (a/an/the) in the current document.",
       "version": "1.0",
     
@@ -13,7 +13,7 @@
         "persistent": false
       },
       "browser_action": {
-        "default_title": "Article quiz"
+        "default_title": "English articles quiz"
       },
       "icons": {
         "16": "./icons/icon16.png",
