@@ -1,5 +1,4 @@
 (function() { // scoping function start
-console.log('script inserted')
 
 /**
  * Create DOM element from the passed parameters
@@ -45,6 +44,7 @@ var APP = function() {
     const articles = ['the', 'a', 'an']
     var interface = {}
     var currentField = null
+    var answerMatrix = articles.map(_ => [0, 0, 0])
 
     /*
         INTERFACE
@@ -116,19 +116,38 @@ var APP = function() {
     */
     function handleAnswer(chosenArticle) {
         if (!currentField) return
-        if (chosenArticle === currentField.dataset.truth) {
-            if (!currentField.classList.contains(classNames.articleFieldWrong)) {
+
+        var correctArticle = currentField.dataset.truth
+        var isFirstAttempt = !currentField.classList.contains(classNames.articleFieldWrong)
+        var isFirstPressOfThisOption = !interface.answerPanel.answerButtons[chosenArticle].classList.contains(classNames.answerOptionButtonFalse)
+
+        function recordAnswer() {
+            var i = articles.indexOf(correctArticle)
+            var j = articles.indexOf(chosenArticle)
+            answerMatrix[i][j]++
+            console.log('recorded answer')
+        }
+        // visually press the button
+        interface.answerPanel.answerButtons[chosenArticle].classList.add(classNames.answerOptionButtonPressed)
+        
+        if (chosenArticle === correctArticle) {
+            // correct answer
+            if (isFirstAttempt) {
                 currentField.classList.add(classNames.articleFieldRight)
+                recordAnswer()
             }
             resetAnswerButtonsStyle()
             interface.answerPanel.answerButtons[chosenArticle].classList.add(classNames.answerOptionButtonTrue)
             selectNextField()
         }
         else {
-            currentField.classList.add(classNames.articleFieldWrong)
+            // wrong answer
+            if (isFirstPressOfThisOption) {
+                currentField.classList.add(classNames.articleFieldWrong)
+                recordAnswer()
+            }
             interface.answerPanel.answerButtons[chosenArticle].classList.add(classNames.answerOptionButtonFalse)
         }
-        interface.answerPanel.answerButtons[chosenArticle].classList.add(classNames.answerOptionButtonPressed)
     }
 
 
@@ -197,6 +216,7 @@ var APP = function() {
 
     function endQuiz() {
         setInterfaceElementPresence(interface.answerPanel, false)
+        console.log(answerMatrix)
     }
 
     function exitWithoutATrace() {
@@ -228,7 +248,6 @@ var APP = function() {
     return {
         // public API
         start:  function() {
-            console.log('started app')
             initInterface()
             setupQuiz()
             document.addEventListener('keypress', documentKeypressHandler)
