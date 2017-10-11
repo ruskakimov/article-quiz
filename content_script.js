@@ -43,7 +43,6 @@ var APP = function() {
         an: /(^|\s)(An )|( an )/g
     }
     const articles = ['the', 'a', 'an']
-    var innerHTML_backup = ''
     var interface = {}
     var currentField = null
 
@@ -179,7 +178,6 @@ var APP = function() {
     }
 
     function setupQuiz() {
-        innerHTML_backup = document.body.innerHTML
         insertFields(document.body)
         setInterfaceElementPresence(interface.answerPanel, true)
         setInterfaceElementPresence(interface.exitButton, true)
@@ -218,15 +216,14 @@ var APP = function() {
     }
 
     function exitWithoutATrace() {
-        console.log('reverting DOM modifications & removing listeners')
         // revert DOM
         removeInterface()
-        if (innerHTML_backup) document.body.innerHTML = innerHTML_backup
         // remove listeners
         document.removeEventListener('keypress', documentKeypressHandler)
         chrome.runtime.onMessage.removeListener(messageHandler)
         // notify background script
         chrome.runtime.sendMessage({closed: true})
+        window.location.reload(false)
     }
 
     return {
