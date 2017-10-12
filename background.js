@@ -15,6 +15,7 @@ var bgAPP = function() {
       }
     },
     reloadHandler: function(tabId) {
+      chrome.tabs.sendMessage(tabId, {exit: true})
       extensionActive[tabId] = false
     },
     messageHandler: function(request, sender, sendResponse) {
