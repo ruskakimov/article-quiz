@@ -1,4 +1,7 @@
 /* article field */
+._article_quiz__field {
+    all: initial;
+}
 ._article_quiz__field-focused {
     background: yellow !important;
     animation: blink-animation 1s linear infinite;
@@ -18,6 +21,7 @@
 
 /* general interface styles */
 ._article_quiz__button {
+    all: initial;
     margin: 20px;
     padding: 0;
     width: 100px;
@@ -29,6 +33,8 @@
     text-align: center;
     background: #eee;
     border: 7px solid #888;
+    border-color: #555;
+    color: #555;
 }
 ._article_quiz__button:hover {
     cursor: pointer;
@@ -47,7 +53,7 @@
     transform: translateX(-50%);
 }
 ._article_quiz__option-button {
-    color: #888;
+    /* color: #888; */
     position: relative;
     transition: all .1s ease-in;
 }
@@ -57,14 +63,12 @@
     bottom: 0;
     left: 50%;
     transform: translate(-50%, 50%);
-    color: #222;
-    background: #eee;
-    width: 25px;
-    height: 25px;
+    color: #fff;
+    background: #000;
+    width: 30px;
+    height: 30px;
     font: 18px monospace;
-    border-radius: 5px;
-    border: 1px solid #aaa;
-    box-shadow: 0 2px 0px 1px #aaa;
+    border-radius: 50%;
 }
 ._article_quiz__option-button-true {
     background: #afa;
@@ -97,6 +101,4 @@
     bottom: 0;
     right: 0;
     z-index: 999999999;
-    border-color: #555;
-    color: #555;
 }
