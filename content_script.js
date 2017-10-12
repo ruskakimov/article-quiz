@@ -32,6 +32,7 @@ var APP = function() {
         },
         articleField: '_article_quiz__field',
         articleFieldFocused: '_article_quiz__field-focused',
+        articleFieldEmpty: '_article_quiz__field-unvisited',
         articleFieldRight: '_article_quiz__field-right',
         articleFieldWrong: '_article_quiz__field-wrong',
         exitButton: '_article_quiz__exit-btn'
@@ -104,6 +105,14 @@ var APP = function() {
         })
     }
 
+    function removeFields() {
+        document.querySelectorAll('.' + classNames.articleField).forEach(field => {
+            var content = document.createTextNode(field.dataset.original)
+            field.parentElement.insertBefore(content, field)
+            field.parentElement.removeChild(field)
+        })
+    }
+
     function resetAnswerButtonsStyle() {
         articles.forEach(article => {
             interface.answerPanel.answerButtons[article].classList.remove(classNames.answerOptionButtonFalse)
@@ -156,7 +165,7 @@ var APP = function() {
     */
     function replaceArticles(text) {
         function makeFieldHTML(article) {
-            return `<span class="${classNames.articleField}" data-truth="${article}" data-original="$&"> _ </span>`
+            return `<span class="${classNames.articleField} ${classNames.articleFieldEmpty}" data-truth="${article}" data-original="$&"> _ </span>`
         }
         text = text.replace(articleRegexes.the, makeFieldHTML('the'))
         text = text.replace(articleRegexes.a, makeFieldHTML('a'))
@@ -202,10 +211,10 @@ var APP = function() {
     function selectNextField() {
         if (currentField) {
             currentField.innerText = currentField.dataset.original
-            currentField.classList.remove(classNames.articleField)
+            currentField.classList.remove(classNames.articleFieldEmpty)
             currentField.classList.remove(classNames.articleFieldFocused)
         }
-        currentField = document.querySelector('.' + classNames.articleField)
+        currentField = document.querySelector('.' + classNames.articleFieldEmpty)
         if (currentField) {
             currentField.classList.add(classNames.articleFieldFocused)
             currentField.scrollIntoViewIfNeeded()
@@ -220,10 +229,10 @@ var APP = function() {
 
     function exitWithoutATrace() {
         removeInterface()
+        removeFields()
         document.removeEventListener('keypress', documentKeypressHandler)
         chrome.runtime.onMessage.removeListener(messageHandler)
         chrome.runtime.sendMessage({closed: true})
-        window.location.reload(false)
     }
 
 

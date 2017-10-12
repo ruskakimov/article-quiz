@@ -1,7 +1,4 @@
 /* article field */
-._article_quiz__field {
-    all: initial;
-}
 ._article_quiz__field-focused {
     background: yellow !important;
     animation: blink-animation 1s linear infinite;
