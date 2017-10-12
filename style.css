@@ -62,11 +62,13 @@
     bottom: 0;
     left: 50%;
     transform: translate(-50%, 50%);
-    color: #fff;
-    background: #000;
     width: 30px;
     height: 30px;
     font: 18px monospace;
+    font-weight: bold;
+    line-height: 30px;
+    color: #eee;
+    background: #000;
     border-radius: 50%;
 }
 ._article_quiz__option-button-true {
@@ -84,13 +86,13 @@
     color: #f33;
 }
 ._article_quiz__option-the:before {
-    content: 'z';
+    content: 'Z';
 }
 ._article_quiz__option-a:before {
-    content: 'x';
+    content: 'X';
 }
 ._article_quiz__option-an:before {
-    content: 'c';
+    content: 'C';
 }
 
 
