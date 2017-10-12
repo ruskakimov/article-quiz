@@ -1,10 +1,12 @@
 /* article field */
 ._article_quiz__field-focused {
+    font-weight: bold !important;
     background: yellow !important;
-    animation: blink-animation 1s linear infinite;
+    animation: blink-animation 1s step-start infinite;
 }
 @keyframes blink-animation {
     50% {
+        color: transparent;
         background: transparent;
     }
 }
