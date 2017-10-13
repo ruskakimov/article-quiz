@@ -53,6 +53,7 @@
 }
 ._article_quiz__option-button {
     position: relative;
+    margin-right: 0;
     transition: all .1s ease-in;
 }
 ._article_quiz__option-button:before {

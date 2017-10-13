@@ -78,8 +78,7 @@ var APP = function() {
         // exit button
         var exitButton = makeElement('button', 'X', [
             classNames.button,
-            classNames.exitButton,
-            classNames.answerOptionButton
+            classNames.exitButton
         ])
         interface.exitButton = {
             el: exitButton,
