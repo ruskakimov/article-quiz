@@ -119,6 +119,10 @@ var APP = function() {
         })
     }
 
+    function showGrade(grade) {
+        alert(grade)
+    }
+
 
     /*
         USER INTERACTION LOGIC
@@ -223,8 +227,33 @@ var APP = function() {
     }
 
     function endQuiz() {
+        function calculateScore() {
+            var correct = articles.reduce((acc, _, i) => acc + answerMatrix[i][i], 0)
+            // total number of attempts
+            var total = answerMatrix.reduce((acc, row) => {
+                return acc + row.reduce((acc, val) => acc + val, 0)
+            }, 0)
+            return correct / total
+        }
+        function determineGrade(score) {
+            var scores    = 'A+  A  A- B+ B  B- C+ C  C- D+ D  D- F'.split(/ +/)
+            var lowerLims = '100 93 90 87 83 80 77 73 70 67 63 60 0'.split(/ +/).map(strPerc => +strPerc / 100)
+            for (var i = 0; i < scores.length; i++) {
+                if (score >= lowerLims[i]) return scores[i]
+            }
+        }
         setInterfaceElementPresence(interface.answerPanel, false)
         console.log(answerMatrix)
+
+        var score = calculateScore()
+
+        if (isNaN(score)) {
+            alert('No articles found on the page.')
+            exitWithoutATrace()
+            return
+        }
+        var grade = determineGrade(score)
+        showGrade(grade)
     }
 
     function exitWithoutATrace() {
@@ -256,10 +285,10 @@ var APP = function() {
     return {
         // public API
         start:  function() {
+            chrome.runtime.sendMessage({opened: true})
             initInterface()
             setupQuiz()
             document.addEventListener('keypress', documentKeypressHandler)
-            chrome.runtime.sendMessage({opened: true})
         },
         exitWithoutATrace
     }
