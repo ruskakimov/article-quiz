@@ -2,7 +2,7 @@
 ._article_quiz__field-focused {
     font-weight: bold !important;
     background: yellow !important;
-    animation: blink-animation 1s step-start infinite;
+    animation: blink-animation 1s step-end infinite;
 }
 @keyframes blink-animation {
     50% {
