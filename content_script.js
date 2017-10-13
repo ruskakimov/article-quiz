@@ -248,7 +248,6 @@ var APP = function() {
             }
         }
         setInterfaceElementPresence(interface.answerPanel, false)
-        console.log(answerMatrix)
         var score = calculateScore()
         if (isNaN(score)) {
             alert('No articles found on the page.')
