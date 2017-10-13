@@ -35,7 +35,8 @@ var APP = function() {
         articleFieldEmpty: '_article_quiz__field-unvisited',
         articleFieldRight: '_article_quiz__field-right',
         articleFieldWrong: '_article_quiz__field-wrong',
-        exitButton: '_article_quiz__exit-btn'
+        exitButton: '_article_quiz__exit-btn',
+        grade: '_article_quiz__grade'
     }
     const articleRegexes = {
         the: /(^|\s)(The )|( the )/g,
@@ -120,7 +121,12 @@ var APP = function() {
     }
 
     function showGrade(grade) {
-        alert(grade)
+        var gradeEl = makeElement('div', grade, [classNames.grade])
+        interface.grade = {
+            el: gradeEl,
+            present: true
+        }
+        document.body.appendChild(gradeEl)
     }
 
 
@@ -138,7 +144,6 @@ var APP = function() {
             var i = articles.indexOf(correctArticle)
             var j = articles.indexOf(chosenArticle)
             answerMatrix[i][j]++
-            console.log('recorded answer')
         }
         // visually press the button
         interface.answerPanel.answerButtons[chosenArticle].classList.add(classNames.answerOptionButtonPressed)
@@ -244,9 +249,7 @@ var APP = function() {
         }
         setInterfaceElementPresence(interface.answerPanel, false)
         console.log(answerMatrix)
-
         var score = calculateScore()
-
         if (isNaN(score)) {
             alert('No articles found on the page.')
             exitWithoutATrace()
