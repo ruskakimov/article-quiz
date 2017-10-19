@@ -16,6 +16,12 @@ function makeElement(tagName, text, classNames) {
     return el
 }
 
+function scrollIntoCenter(element) {
+    const documentTopOffset = element.getBoundingClientRect().top + window.pageYOffset
+    const middle = documentTopOffset - window.innerHeight / 2
+    window.scrollTo(0, middle)
+}
+
 var APP = function() {
     // private attrs
     const classNames = {
@@ -245,7 +251,7 @@ var APP = function() {
         currentField = document.querySelector('.' + classNames.articleFieldEmpty)
         if (currentField) {
             currentField.classList.add(classNames.articleFieldFocused)
-            currentField.scrollIntoViewIfNeeded()
+            scrollIntoCenter(currentField)
         }
         else endQuiz()
     }
