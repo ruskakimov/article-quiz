@@ -85,6 +85,12 @@ var APP = function() {
             present: false
         }
         exitButton.addEventListener('click', exitWithoutATrace)
+        // grade
+        var gradeEl = makeElement('div', '', [classNames.grade])
+        interface.grade = {
+            el: gradeEl,
+            present: false
+        }
     }
 
     function setInterfaceElementPresence(interfaceObj, present) {
@@ -119,13 +125,25 @@ var APP = function() {
         })
     }
 
-    function showGrade(grade) {
-        var gradeEl = makeElement('div', grade, [classNames.grade])
-        interface.grade = {
-            el: gradeEl,
-            present: true
+    function calculateAndShowGrade() {
+        function calculateScore(answerMatrix) {
+            var correct = articles.reduce((acc, _, i) => acc + answerMatrix[i][i], 0)
+            // total number of attempts
+            var total = answerMatrix.reduce((acc, row) => {
+                return acc + row.reduce((acc, val) => acc + val, 0)
+            }, 0)
+            return correct / total
         }
-        document.body.appendChild(gradeEl)
+        function determineGrade(score) {
+            var scores    = 'A+  A  A- B+ B  B- C+ C  C- D+ D  D- F'.split(/ +/)
+            var lowerLims = '100 93 90 87 83 80 77 73 70 67 63 60 0'.split(/ +/).map(strPerc => +strPerc / 100)
+            for (var i = 0; i < scores.length; i++) {
+                if (score >= lowerLims[i]) return scores[i]
+            }
+        }
+        var score = calculateScore(answerMatrix)
+        var grade = determineGrade(score)
+        interface.grade.el.innerText = grade
     }
 
 
@@ -155,6 +173,7 @@ var APP = function() {
             }
             resetAnswerButtonsStyle()
             interface.answerPanel.answerButtons[chosenArticle].classList.add(classNames.answerOptionButtonTrue)
+            calculateAndShowGrade()
             selectNextField()
         }
         else {
@@ -213,6 +232,7 @@ var APP = function() {
         insertFields(document.body)
         setInterfaceElementPresence(interface.answerPanel, true)
         setInterfaceElementPresence(interface.exitButton, true)
+        setInterfaceElementPresence(interface.grade, true)
         selectNextField()
     }
 
@@ -231,30 +251,11 @@ var APP = function() {
     }
 
     function endQuiz() {
-        function calculateScore() {
-            var correct = articles.reduce((acc, _, i) => acc + answerMatrix[i][i], 0)
-            // total number of attempts
-            var total = answerMatrix.reduce((acc, row) => {
-                return acc + row.reduce((acc, val) => acc + val, 0)
-            }, 0)
-            return correct / total
-        }
-        function determineGrade(score) {
-            var scores    = 'A+  A  A- B+ B  B- C+ C  C- D+ D  D- F'.split(/ +/)
-            var lowerLims = '100 93 90 87 83 80 77 73 70 67 63 60 0'.split(/ +/).map(strPerc => +strPerc / 100)
-            for (var i = 0; i < scores.length; i++) {
-                if (score >= lowerLims[i]) return scores[i]
-            }
-        }
         setInterfaceElementPresence(interface.answerPanel, false)
-        var score = calculateScore()
-        if (isNaN(score)) {
+        if (answerMatrix.every(row => row.every(val => val === 0))) {
             alert('No articles found on the page.')
             exitWithoutATrace()
-            return
         }
-        var grade = determineGrade(score)
-        showGrade(grade)
     }
 
     function exitWithoutATrace() {
@@ -304,12 +305,10 @@ function messageHandler(request, sender, sendResponse) {
 function DOMisReady() {
     return new Promise(function (resolve) {
         if (document.readyState === 'interactive' || document.readyState === 'complete') resolve()
-        else {
-            document.addEventListener('DOMContentLoaded', function listenerWithSelfDestruct(e) {
-                resolve()
-                document.removeEventListener('DOMContentLoaded', listenerWithSelfDestruct)
-            })
-        }
+        document.addEventListener('DOMContentLoaded', function listenerWithSelfDestruct(e) {
+            document.removeEventListener('DOMContentLoaded', listenerWithSelfDestruct)
+            resolve()
+        })
     })
 }
 
